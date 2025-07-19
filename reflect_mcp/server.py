@@ -359,13 +359,7 @@ async def daily_journal_workflow() -> List[TextContent]:
     ]
 
 
-async def main():
+def main():
     """Run the MCP server."""
-    from mcp.server.stdio import stdio_server
-    
-    async with stdio_server() as (read_stream, write_stream):
-        await mcp.run(
-            read_stream,
-            write_stream,
-            mcp.create_initialization_options()
-        )
+    # FastMCP handles stdio transport internally
+    mcp.run("stdio")
