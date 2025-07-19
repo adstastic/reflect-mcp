@@ -5,7 +5,7 @@ from typing import Optional, Dict, Any, List
 from authlib.integrations.httpx_client import AsyncOAuth2Client
 from .config import config
 from .models import (
-    Graph, Book, Link, Note, User,
+    Graph, Book, Link, CreateNoteResponse, AppendDailyNoteResponse, User,
     CreateLinkRequest, CreateNoteRequest, AppendDailyNoteRequest
 )
 
@@ -96,21 +96,24 @@ class ReflectClient:
         """Get all graphs."""
         response = await self._request("GET", "/graphs")
         data = response.json()
-        return [Graph(**graph) for graph in data.get("graphs", [])]
+        # API returns array directly
+        return [Graph(**graph) for graph in data]
     
     # Book operations
     async def list_books(self, graph_id: str) -> List[Book]:
         """Get all books for a graph."""
         response = await self._request("GET", f"/graphs/{graph_id}/books")
         data = response.json()
-        return [Book(**book) for book in data.get("books", [])]
+        # API returns array directly
+        return [Book(**book) for book in data]
     
     # Link operations
     async def list_links(self, graph_id: str) -> List[Link]:
         """Get all links for a graph."""
         response = await self._request("GET", f"/graphs/{graph_id}/links")
         data = response.json()
-        return [Link(**link) for link in data.get("links", [])]
+        # API returns array directly
+        return [Link(**link) for link in data]
     
     async def create_link(self, graph_id: str, link_data: CreateLinkRequest) -> Link:
         """Create a new link."""
@@ -122,23 +125,23 @@ class ReflectClient:
         return Link(**response.json())
     
     # Note operations
-    async def create_note(self, graph_id: str, note_data: CreateNoteRequest) -> Note:
+    async def create_note(self, graph_id: str, note_data: CreateNoteRequest) -> CreateNoteResponse:
         """Create a new note."""
         response = await self._request(
             "POST",
             f"/graphs/{graph_id}/notes",
             json=note_data.model_dump(exclude_none=True)
         )
-        return Note(**response.json())
+        return CreateNoteResponse(**response.json())
     
-    async def append_daily_note(self, graph_id: str, append_data: AppendDailyNoteRequest) -> Dict[str, Any]:
+    async def append_daily_note(self, graph_id: str, append_data: AppendDailyNoteRequest) -> AppendDailyNoteResponse:
         """Append to daily note."""
         response = await self._request(
             "PUT",
             f"/graphs/{graph_id}/daily-notes",
             json=append_data.model_dump(exclude_none=True)
         )
-        return response.json()
+        return AppendDailyNoteResponse(**response.json())
     
     # User operations
     async def get_current_user(self) -> User:

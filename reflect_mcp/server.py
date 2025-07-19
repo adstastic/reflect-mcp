@@ -97,7 +97,8 @@ async def get_default_graph() -> Optional[str]:
     
     async with ReflectClient() as client:
         user = await client.get_current_user()
-        return user.default_graph_id
+        # Return first graph_id if available
+        return user.graph_ids[0] if user.graph_ids else None
 
 
 @mcp.tool()

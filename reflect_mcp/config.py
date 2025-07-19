@@ -25,8 +25,8 @@ class ReflectConfig(BaseModel):
         description="OAuth2 redirect URI"
     )
     access_token: Optional[str] = Field(
-        default=None,
-        description="OAuth2 access token (can be set manually)"
+        default_factory=lambda: os.getenv("REFLECT_ACCESS_TOKEN"),
+        description="OAuth2 access token (can be set manually or via environment)"
     )
     refresh_token: Optional[str] = Field(
         default=None,

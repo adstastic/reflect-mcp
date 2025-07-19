@@ -9,18 +9,15 @@ class Graph(BaseModel):
     """Reflect graph model."""
     id: str
     name: str
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
 
 
 class Book(BaseModel):
     """Reflect book model."""
     id: str
+    asin: str
     title: str
-    author: Optional[str] = None
-    graph_id: str
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    authors: List[str] = Field(default_factory=list)
+    notes: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 class Link(BaseModel):
@@ -29,29 +26,26 @@ class Link(BaseModel):
     url: str
     title: Optional[str] = None
     description: Optional[str] = None
-    graph_id: str
+    updated_at: str
     highlights: List[str] = Field(default_factory=list)
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
 
 
-class Note(BaseModel):
-    """Reflect note model."""
-    id: str
-    subject: str
-    content_markdown: str
-    graph_id: str
-    pinned: bool = False
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+class CreateNoteResponse(BaseModel):
+    """Response from creating a note."""
+    success: bool
+
+
+class AppendDailyNoteResponse(BaseModel):
+    """Response from appending to daily note."""
+    success: bool
 
 
 class User(BaseModel):
     """Reflect user model."""
-    id: str
+    uid: str
     email: str
-    name: Optional[str] = None
-    default_graph_id: Optional[str] = None
+    name: str
+    graph_ids: List[str] = Field(default_factory=list)
 
 
 class CreateLinkRequest(BaseModel):
