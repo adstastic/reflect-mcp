@@ -9,6 +9,7 @@ class Graph(BaseModel):
     """Reflect graph model."""
     id: str
     name: str
+    acl: Optional[List[str]] = Field(default_factory=list)
 
 
 class Book(BaseModel):
@@ -42,10 +43,11 @@ class AppendDailyNoteResponse(BaseModel):
 
 class User(BaseModel):
     """Reflect user model."""
-    uid: str
+    id: str
     email: str
-    name: str
+    name: Optional[str] = None
     graph_ids: List[str] = Field(default_factory=list)
+    preferences: Optional[Dict[str, Any]] = None
 
 
 class CreateLinkRequest(BaseModel):
