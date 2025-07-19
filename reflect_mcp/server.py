@@ -102,12 +102,18 @@ async def get_default_graph() -> Optional[str]:
 
 
 @mcp.tool()
-async def list_books(graph_id: Optional[str] = None) -> List[Dict[str, Any]]:
+async def list_books(
+    graph_id: Optional[str] = None, 
+    limit: Optional[int] = 50,
+    offset: Optional[int] = 0
+) -> Dict[str, Any]:
     """
-    Get all books for a specific graph.
+    Get books for a specific graph with pagination.
     
     Args:
         graph_id: Graph ID (uses default if not provided)
+        limit: Maximum number of books to return per page (default: 50)
+        offset: Number of books to skip (default: 0)
     """
     if not config.access_token:
         raise ValueError("Not authenticated. Use 'authenticate' tool first.")
@@ -119,16 +125,38 @@ async def list_books(graph_id: Optional[str] = None) -> List[Dict[str, Any]]:
     
     async with ReflectClient() as client:
         books = await client.list_books(graph_id)
-        return [book.model_dump() for book in books]
+        total_books = len(books)
+        
+        # Apply pagination
+        start_idx = offset
+        end_idx = offset + limit if limit else len(books)
+        paginated_books = books[start_idx:end_idx]
+        
+        return {
+            "books": [book.model_dump() for book in paginated_books],
+            "pagination": {
+                "total": total_books,
+                "limit": limit,
+                "offset": offset,
+                "returned": len(paginated_books),
+                "has_more": end_idx < total_books
+            }
+        }
 
 
 @mcp.tool()
-async def list_links(graph_id: Optional[str] = None) -> List[Dict[str, Any]]:
+async def list_links(
+    graph_id: Optional[str] = None, 
+    limit: Optional[int] = 50,
+    offset: Optional[int] = 0
+) -> Dict[str, Any]:
     """
-    Get all links for a specific graph.
+    Get links for a specific graph with pagination.
     
     Args:
         graph_id: Graph ID (uses default if not provided)
+        limit: Maximum number of links to return per page (default: 50)
+        offset: Number of links to skip (default: 0)
     """
     if not config.access_token:
         raise ValueError("Not authenticated. Use 'authenticate' tool first.")
@@ -140,7 +168,23 @@ async def list_links(graph_id: Optional[str] = None) -> List[Dict[str, Any]]:
     
     async with ReflectClient() as client:
         links = await client.list_links(graph_id)
-        return [link.model_dump() for link in links]
+        total_links = len(links)
+        
+        # Apply pagination
+        start_idx = offset
+        end_idx = offset + limit if limit else len(links)
+        paginated_links = links[start_idx:end_idx]
+        
+        return {
+            "links": [link.model_dump() for link in paginated_links],
+            "pagination": {
+                "total": total_links,
+                "limit": limit,
+                "offset": offset,
+                "returned": len(paginated_links),
+                "has_more": end_idx < total_links
+            }
+        }
 
 
 @mcp.tool()
@@ -248,7 +292,7 @@ async def append_daily_note(
     
     async with ReflectClient() as client:
         result = await client.append_daily_note(graph_id, append_data)
-        return result
+        return result.model_dump()
 
 
 @mcp.tool()
